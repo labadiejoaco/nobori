@@ -141,11 +141,11 @@
 </script>
 
 <div>
-	<div class="mb-4 flex items-center">
+	<div class="mb-4 flex items-center justify-between gap-4">
 		<Input class="max-w-sm" placeholder="Filter emails..." type="text" bind:value={$filterValue} />
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger asChild let:builder>
-				<Button variant="outline" class="ml-auto" builders={[builder]}>
+				<Button variant="outline" builders={[builder]}>
 					Columns <ChevronDown class="ml-2 h-4 w-4" />
 				</Button>
 			</DropdownMenu.Trigger>
@@ -221,7 +221,7 @@
 		</Table.Root>
 	</div>
 	<div class="mt-4 flex items-center justify-end space-x-2">
-		<div class="text-muted-foreground flex-1 text-sm">
+		<div class="flex-1 text-sm text-muted-foreground">
 			{Object.keys($selectedDataIds).length} of{' '}
 			{$rows.length} row(s) selected.
 		</div>
