@@ -16,12 +16,15 @@
 	import { readable } from 'svelte/store';
 	import Actions from './data-table-actions.svelte';
 	import DataTableCheckbox from './data-table-checkbox.svelte';
-	import DataTableStatusBadge from './data-table-status-badge.svelte';
+	import DataTableStatusCell from './data-table-status-cell.svelte';
+	import DataTableTitleCell from './data-table-title-cell.svelte';
 
 	export let data;
 
 	const table = createTable(readable(data), {
-		sort: addSortBy({ disableMultiSort: true }),
+		sort: addSortBy({
+			toggleOrder: ['asc', 'desc']
+		}),
 		page: addPagination(),
 		filter: addTableFilter({
 			fn: ({ filterValue, value }) => value.includes(filterValue)
@@ -57,10 +60,44 @@
 			}
 		}),
 		table.column({
+			header: 'Created at',
+			accessor: 'created_at',
+			cell: ({ value }) => {
+				const date = new Date(value);
+
+				const formatted = new Intl.DateTimeFormat('en-US', {
+					year: 'numeric',
+					month: '2-digit',
+					day: '2-digit'
+				}).format(date);
+
+				return formatted;
+			},
+			plugins: {
+				filter: {
+					exclude: true
+				}
+			}
+		}),
+		table.column({
+			header: 'Title',
+			accessor: 'title',
+			cell: ({ value }) => {
+				return createRender(DataTableTitleCell, {
+					value
+				});
+			},
+			plugins: {
+				sort: {
+					disable: true
+				}
+			}
+		}),
+		table.column({
 			header: 'Status',
 			accessor: 'status',
 			cell: ({ value }) => {
-				return createRender(DataTableStatusBadge, {
+				return createRender(DataTableStatusCell, {
 					value
 				});
 			},
@@ -74,28 +111,8 @@
 			}
 		}),
 		table.column({
-			header: 'Email',
-			accessor: 'email',
-			cell: ({ value }) => value.toLowerCase(),
-			plugins: {
-				filter: {
-					getFilterValue(value) {
-						return value.toLowerCase();
-					}
-				}
-			}
-		}),
-		table.column({
-			header: 'Amount',
-			accessor: 'amount',
-			cell: ({ value }) => {
-				const formatted = new Intl.NumberFormat('en-US', {
-					style: 'currency',
-					currency: 'USD'
-				}).format(value);
-
-				return formatted;
-			},
+			header: 'Priority',
+			accessor: 'priority',
 			plugins: {
 				sort: {
 					disable: true
@@ -137,12 +154,12 @@
 
 	const { selectedDataIds } = pluginStates.select;
 
-	const hideableCols = ['status', 'email', 'amount'];
+	const hideableCols = ['created_at', 'title', 'status', 'priority'];
 </script>
 
 <div>
 	<div class="mb-4 flex items-center justify-between gap-4">
-		<Input class="max-w-sm" placeholder="Filter emails..." type="text" bind:value={$filterValue} />
+		<Input class="max-w-sm" placeholder="Filter tasks..." type="text" bind:value={$filterValue} />
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger asChild let:builder>
 				<Button variant="outline" builders={[builder]}>
@@ -169,11 +186,7 @@
 							{#each headerRow.cells as cell (cell.id)}
 								<Subscribe attrs={cell.attrs()} let:attrs props={cell.props()} let:props>
 									<Table.Head {...attrs} class={cn('[&:has([role=checkbox])]:pl-3')}>
-										{#if cell.id === 'amount'}
-											<div class="text-right font-medium">
-												<Render of={cell.render()} />
-											</div>
-										{:else if cell.id === 'email'}
+										{#if cell.id === 'created_at'}
 											<Button variant="ghost" on:click={props.sort.toggle}>
 												<Render of={cell.render()} />
 												<ArrowUpDown
@@ -200,17 +213,7 @@
 							{#each row.cells as cell (cell.id)}
 								<Subscribe attrs={cell.attrs()} let:attrs>
 									<Table.Cell class="[&:has([role=checkbox])]:pl-3" {...attrs}>
-										{#if cell.id === 'amount'}
-											<div class="text-right font-medium">
-												<Render of={cell.render()} />
-											</div>
-										{:else if cell.id === 'status'}
-											<div class="capitalize">
-												<Render of={cell.render()} />
-											</div>
-										{:else}
-											<Render of={cell.render()} />
-										{/if}
+										<Render of={cell.render()} />
 									</Table.Cell>
 								</Subscribe>
 							{/each}
