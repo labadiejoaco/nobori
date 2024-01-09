@@ -29,9 +29,10 @@
 				class="space-y-4"
 			>
 				<div class="space-y-1">
-					<Label for="email" class="text-muted-foreground font-normal">Email</Label>
+					<Label for="email" class="font-normal text-muted-foreground">Email</Label>
 					<Input
 						type="email"
+						id="email"
 						name="email"
 						placeholder="e.g., email@example.com"
 						required
@@ -39,9 +40,10 @@
 					/>
 				</div>
 				<div class="space-y-1">
-					<Label for="password" class="text-muted-foreground font-normal">Password</Label>
+					<Label for="password" class="font-normal text-muted-foreground">Password</Label>
 					<Input
 						type="password"
+						id="password"
 						name="password"
 						placeholder="e.g., ••••••••"
 						required
@@ -60,10 +62,10 @@
 					</div>
 				{/if}
 			</form>
-			<p class="text-muted-foreground text-sm">
+			<p class="text-sm text-muted-foreground">
 				Don't have an account? <a
 					href="/auth/signup"
-					class="hover:text-primary underline underline-offset-4 transition-all">Sign up</a
+					class="underline underline-offset-4 transition-all hover:text-primary">Sign up</a
 				>
 			</p>
 		</div>

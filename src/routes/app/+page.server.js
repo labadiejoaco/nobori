@@ -16,3 +16,14 @@ export async function load({ locals: { getSession, supabase } }) {
 		tasks
 	};
 }
+
+/** @type {import('./$types').Actions} */
+export const actions = {
+	'add-task': async ({ request, locals: { supabase } }) => {
+		const formData = await request.formData();
+
+		const title = formData.get('title');
+		const description = formData.get('description');
+		const priority = formData.get('priority');
+	}
+};
