@@ -1,10 +1,13 @@
 <script>
 	import { Button } from '$lib/components/ui/button';
+	import * as Dialog from '$lib/components/ui/dialog';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { Input } from '$lib/components/ui/input';
+	import { Label } from '$lib/components/ui/label';
 	import * as Table from '$lib/components/ui/table';
+	import { Textarea } from '$lib/components/ui/textarea';
 	import { cn } from '$lib/utils';
-	import { ArrowUpDown, ChevronDown } from 'lucide-svelte';
+	import { ArrowUpDown, ChevronDown, Loader2 } from 'lucide-svelte';
 	import { Render, Subscribe, createRender, createTable } from 'svelte-headless-table';
 	import {
 		addHiddenColumns,
@@ -13,17 +16,28 @@
 		addSortBy,
 		addTableFilter
 	} from 'svelte-headless-table/plugins';
+	import { toast } from 'svelte-sonner';
 	import { readable } from 'svelte/store';
+	import { superForm } from 'sveltekit-superforms/client';
+	import { tasks } from '../../stores/task-store';
 	import Actions from './data-table-actions.svelte';
 	import DataTableCheckbox from './data-table-checkbox.svelte';
+	import DataTablePriorityCell from './data-table-priority-cell.svelte';
 	import DataTableStatusCell from './data-table-status-cell.svelte';
 	import DataTableTitleCell from './data-table-title-cell.svelte';
 
 	export let data;
 
-	const table = createTable(readable(data), {
+	const { form, enhance, constraints, errors, delayed } = superForm(data.form, {
+		onUpdated({ form }) {
+			toast(form.message);
+		},
+		resetForm: true
+	});
+
+	const table = createTable(readable($tasks), {
 		sort: addSortBy({
-			toggleOrder: ['asc', 'desc']
+			toggleOrder: ['desc', 'asc']
 		}),
 		page: addPagination(),
 		filter: addTableFilter({
@@ -68,7 +82,10 @@
 				const formatted = new Intl.DateTimeFormat('en-US', {
 					year: 'numeric',
 					month: '2-digit',
-					day: '2-digit'
+					day: '2-digit',
+					hour: '2-digit',
+					minute: '2-digit',
+					second: '2-digit'
 				}).format(date);
 
 				return formatted;
@@ -113,6 +130,11 @@
 		table.column({
 			header: 'Priority',
 			accessor: 'priority',
+			cell: ({ value }) => {
+				return createRender(DataTablePriorityCell, {
+					value
+				});
+			},
 			plugins: {
 				sort: {
 					disable: true
@@ -159,23 +181,98 @@
 
 <div>
 	<div class="mb-4 flex items-center justify-between gap-4">
-		<Input class="max-w-sm" placeholder="Filter tasks..." type="text" bind:value={$filterValue} />
-		<DropdownMenu.Root>
-			<DropdownMenu.Trigger asChild let:builder>
-				<Button variant="outline" builders={[builder]}>
-					Columns <ChevronDown class="ml-2 h-4 w-4" />
-				</Button>
-			</DropdownMenu.Trigger>
-			<DropdownMenu.Content>
-				{#each flatColumns as col}
-					{#if hideableCols.includes(col.id)}
-						<DropdownMenu.CheckboxItem bind:checked={hideForId[col.id]}>
-							{col.header}
-						</DropdownMenu.CheckboxItem>
-					{/if}
-				{/each}
-			</DropdownMenu.Content>
-		</DropdownMenu.Root>
+		<div class="flex gap-4">
+			<Input type="text" placeholder="Filter tasks..." bind:value={$filterValue} />
+			<DropdownMenu.Root>
+				<DropdownMenu.Trigger asChild let:builder>
+					<Button variant="outline" builders={[builder]}>
+						Columns <ChevronDown class="ml-2 h-4 w-4" />
+					</Button>
+				</DropdownMenu.Trigger>
+				<DropdownMenu.Content>
+					{#each flatColumns as col}
+						{#if hideableCols.includes(col.id)}
+							<DropdownMenu.CheckboxItem bind:checked={hideForId[col.id]}>
+								{col.header}
+							</DropdownMenu.CheckboxItem>
+						{/if}
+					{/each}
+				</DropdownMenu.Content>
+			</DropdownMenu.Root>
+		</div>
+		<Dialog.Root>
+			<Dialog.Trigger asChild let:builder>
+				<Button builders={[builder]}>Create Task</Button>
+			</Dialog.Trigger>
+			<Dialog.Content>
+				<Dialog.Header>
+					<Dialog.Title>Create a New Task</Dialog.Title>
+					<Dialog.Description>Provide details for your new task below.</Dialog.Description>
+				</Dialog.Header>
+				<form id="add-task" action="?/add-task" method="post" use:enhance class="space-y-4">
+					<div class="space-y-1">
+						<Label for="title">Title</Label>
+						<Input
+							type="text"
+							id="title"
+							name="title"
+							placeholder="e.g., Update software and apps"
+							{...$constraints.title}
+							disabled={$delayed}
+							bind:value={$form.title}
+						/>
+						{#if $errors.title}
+							<span class="text-sm font-medium text-red-600">{$errors.title}</span>
+						{/if}
+					</div>
+					<div class="space-y-1">
+						<Label for="description"
+							>Description <span class="text-muted-foreground">(optional)</span></Label
+						>
+						<Textarea
+							id="description"
+							name="description"
+							placeholder="Add task details here..."
+							{...$constraints.description}
+							disabled={$delayed}
+							bind:value={$form.description}
+						/>
+						{#if $errors.description}
+							<span class="text-sm font-medium text-red-600">{$errors.description}</span>
+						{/if}
+					</div>
+					<div class="space-y-1">
+						<Label for="priority">Priority</Label>
+						<div>
+							<select
+								id="priority"
+								name="priority"
+								{...$constraints.priority}
+								disabled={$delayed}
+								bind:value={$form.priority}
+								class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+							>
+								<option value="" disabled selected>Select priority</option>
+								<option value="low">Low</option>
+								<option value="medium">Medium</option>
+								<option value="high">High</option>
+							</select>
+						</div>
+						{#if $errors.priority}
+							<span class="text-sm font-medium text-red-600">{$errors.priority}</span>
+						{/if}
+					</div>
+				</form>
+				<Dialog.Footer>
+					<Button type="submit" form="add-task">
+						{#if $delayed}
+							<Loader2 class="mr-2 h-4 w-4 animate-spin" />
+						{/if}
+						Add Task
+					</Button>
+				</Dialog.Footer>
+			</Dialog.Content>
+		</Dialog.Root>
 	</div>
 	<div class="rounded-md border">
 		<Table.Root {...$tableAttrs}>

@@ -23,7 +23,7 @@ export const actions = {
 		});
 
 		if (error) {
-			return fail(500, { error: 'Server error. Try again later.', success: false });
+			return fail(500, { error: 'Server error. Try again later.' });
 		}
 
 		throw redirect(303, '/app');

@@ -21,6 +21,7 @@
 			</DropdownMenu.Item>
 		</DropdownMenu.Group>
 		<DropdownMenu.Separator />
-		<DropdownMenu.Item>View task details</DropdownMenu.Item>
+		<DropdownMenu.Item href={`/app/${id}`}>View task details</DropdownMenu.Item>
+		<DropdownMenu.Item>Delete task</DropdownMenu.Item>
 	</DropdownMenu.Content>
 </DropdownMenu.Root>
