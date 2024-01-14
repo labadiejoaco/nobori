@@ -8,7 +8,7 @@
 	import { Separator } from '$lib/components/ui/separator';
 	import { Toaster } from '$lib/components/ui/sonner';
 	import { Textarea } from '$lib/components/ui/textarea';
-	import { Loader2 } from 'lucide-svelte';
+	import { ArrowLeft, Loader2 } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 	import { superForm } from 'sveltekit-superforms/client';
 
@@ -32,7 +32,10 @@
 <Toaster position="bottom-center" />
 <div class="container mx-auto py-8">
 	<div class="mb-4 flex items-center justify-between gap-4">
-		<div class="flex items-center">
+		<div class="flex items-center justify-center gap-4">
+			<a href="/app">
+				<ArrowLeft class="h-5 w-5 cursor-pointer text-muted-foreground" />
+			</a>
 			<div>
 				<h1 class="text-2xl font-medium">Task Details</h1>
 				<p class="text-muted-foreground">Update your task details.</p>

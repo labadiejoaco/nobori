@@ -22,6 +22,7 @@
 	import { tasks } from '../../stores/task-store';
 	import Actions from './data-table-actions.svelte';
 	import DataTableCheckbox from './data-table-checkbox.svelte';
+	import DataTableCreatedAtCell from './data-table-created-at-cell.svelte';
 	import DataTablePriorityCell from './data-table-priority-cell.svelte';
 	import DataTableStatusCell from './data-table-status-cell.svelte';
 	import DataTableTitleCell from './data-table-title-cell.svelte';
@@ -77,18 +78,9 @@
 			header: 'Created at',
 			accessor: 'created_at',
 			cell: ({ value }) => {
-				const date = new Date(value);
-
-				const formatted = new Intl.DateTimeFormat('en-US', {
-					year: 'numeric',
-					month: '2-digit',
-					day: '2-digit',
-					hour: '2-digit',
-					minute: '2-digit',
-					second: '2-digit'
-				}).format(date);
-
-				return formatted;
+				return createRender(DataTableCreatedAtCell, {
+					value
+				});
 			},
 			plugins: {
 				filter: {
@@ -283,15 +275,17 @@
 							<Subscribe attrs={cell.attrs()} let:attrs props={cell.props()} let:props>
 								<Table.Head {...attrs} class={cn('[&:has([role=checkbox])]:pl-3')}>
 									{#if cell.id === 'created_at'}
-										<Button variant="ghost" on:click={props.sort.toggle}>
-											<Render of={cell.render()} />
-											<ArrowUpDown
-												class={cn(
-													$sortKeys[0]?.id === cell.id && 'text-foreground',
-													'ml-2 h-4 w-4'
-												)}
-											/>
-										</Button>
+										<div class=" text-center">
+											<Button variant="ghost" on:click={props.sort.toggle}>
+												<Render of={cell.render()} />
+												<ArrowUpDown
+													class={cn(
+														$sortKeys[0]?.id === cell.id && 'text-foreground',
+														'ml-2 h-4 w-4'
+													)}
+												/>
+											</Button>
+										</div>
 									{:else}
 										<Render of={cell.render()} />
 									{/if}
@@ -309,7 +303,13 @@
 						{#each row.cells as cell (cell.id)}
 							<Subscribe attrs={cell.attrs()} let:attrs>
 								<Table.Cell class="[&:has([role=checkbox])]:pl-3" {...attrs}>
-									<Render of={cell.render()} />
+									{#if cell.id === 'created_at'}
+										<div class="text-center">
+											<Render of={cell.render()} />
+										</div>
+									{:else}
+										<Render of={cell.render()} />
+									{/if}
 								</Table.Cell>
 							</Subscribe>
 						{/each}
