@@ -20,14 +20,12 @@
 
 <Toaster position="bottom-center" />
 <div class="container mx-auto py-8">
-	<div class="mb-6 flex items-center justify-between gap-4">
-		<div class="flex items-center">
-			<div>
-				<h1 class="text-2xl font-medium">Welcome back!</h1>
-				<p class="text-muted-foreground">
-					Let's make today productive! Your tasks are waiting for you.
-				</p>
-			</div>
+	<div class="mb-4 flex items-center justify-between gap-4">
+		<div>
+			<h1 class="text-2xl font-medium">Welcome back!</h1>
+			<p class="text-muted-foreground">
+				Let's make today productive! Your tasks are waiting for you.
+			</p>
 		</div>
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger asChild let:builder>

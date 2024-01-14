@@ -3,8 +3,8 @@ import { message, superValidate } from 'sveltekit-superforms/server';
 import { z } from 'zod';
 
 const taskSchema = z.object({
-	title: z.string().min(2).max(100),
-	description: z.string().min(2).max(100),
+	title: z.string().min(1).max(100),
+	description: z.string().min(1).max(100),
 	priority: z.enum(['low', 'medium', 'high'])
 });
 
@@ -31,7 +31,7 @@ export async function load(event) {
 
 /** @type {import('./$types').Actions} */
 export const actions = {
-	'add-task': async (event) => {
+	'create-task': async (event) => {
 		const form = await superValidate(event, taskSchema);
 
 		if (!form.valid) {
@@ -40,16 +40,13 @@ export const actions = {
 
 		const session = await event.locals.getSession();
 
-		const { data, error } = await event.locals.supabase
-			.from('tasks')
-			.insert({
-				user_id: session.user.id,
-				title: form.data.title,
-				description: form.data.description,
-				status: 'todo',
-				priority: form.data.priority
-			})
-			.select();
+		const { error } = await event.locals.supabase.from('tasks').insert({
+			user_id: session.user.id,
+			title: form.data.title,
+			description: form.data.description,
+			status: 'todo',
+			priority: form.data.priority
+		});
 
 		if (error) {
 			return message(form, "Sorry, we couldn't create your task. Please try again later.", {
