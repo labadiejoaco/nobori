@@ -23,6 +23,7 @@
 	import Actions from './data-table-actions.svelte';
 	import DataTableCheckbox from './data-table-checkbox.svelte';
 	import DataTableCreatedAtCell from './data-table-created-at-cell.svelte';
+	import DataTablePagination from './data-table-pagination.svelte';
 	import DataTablePriorityCell from './data-table-priority-cell.svelte';
 	import DataTableStatusCell from './data-table-status-cell.svelte';
 	import DataTableTitleCell from './data-table-title-cell.svelte';
@@ -172,7 +173,7 @@
 </script>
 
 <div class="mb-4 flex items-center justify-between gap-4">
-	<div class="flex gap-4">
+	<div class="flex flex-1 gap-4">
 		<Input type="text" placeholder="Filter tasks..." bind:value={$filterValue} />
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger asChild let:builder>
@@ -217,9 +218,7 @@
 					{/if}
 				</div>
 				<div class="space-y-1">
-					<Label for="description"
-						>Description <span class="text-muted-foreground">(optional)</span></Label
-					>
+					<Label for="description">Description</Label>
 					<Textarea
 						id="description"
 						name="description"
@@ -265,7 +264,7 @@
 		</Dialog.Content>
 	</Dialog.Root>
 </div>
-<div class="rounded-md border">
+<div class="rounded-t-md border">
 	<Table.Root {...$tableAttrs}>
 		<Table.Header>
 			{#each $headerRows as headerRow}
@@ -319,21 +318,4 @@
 		</Table.Body>
 	</Table.Root>
 </div>
-<div class="mt-4 flex items-center justify-end space-x-2">
-	<div class="flex-1 text-sm text-muted-foreground">
-		{Object.keys($selectedDataIds).length} of{' '}
-		{$rows.length} row(s) selected.
-	</div>
-	<Button
-		variant="outline"
-		size="sm"
-		on:click={() => ($pageIndex = $pageIndex - 1)}
-		disabled={!$hasPreviousPage}>Previous</Button
-	>
-	<Button
-		variant="outline"
-		size="sm"
-		disabled={!$hasNextPage}
-		on:click={() => ($pageIndex = $pageIndex + 1)}>Next</Button
-	>
-</div>
+<DataTablePagination {pageRows} {pluginStates} {rows} />

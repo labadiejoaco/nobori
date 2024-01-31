@@ -8,7 +8,7 @@
 	import { Separator } from '$lib/components/ui/separator';
 	import { Toaster } from '$lib/components/ui/sonner';
 	import { Textarea } from '$lib/components/ui/textarea';
-	import { ArrowLeft, Loader2 } from 'lucide-svelte';
+	import { Loader2 } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 	import { superForm } from 'sveltekit-superforms/client';
 
@@ -33,9 +33,6 @@
 <div class="container mx-auto py-8">
 	<div class="mb-4 flex items-center justify-between gap-4">
 		<div class="flex items-center justify-center gap-4">
-			<a href="/app">
-				<ArrowLeft class="h-5 w-5 cursor-pointer text-muted-foreground" />
-			</a>
 			<div>
 				<h1 class="text-2xl font-medium">Task Details</h1>
 				<p class="text-muted-foreground">Update your task details.</p>
@@ -64,6 +61,9 @@
 		</DropdownMenu.Root>
 	</div>
 	<Separator class="mb-4" />
+	<div class="mb-3">
+		<a href="/app" class="text-sm text-muted-foreground underline outline-offset-4">Go Back</a>
+	</div>
 	<form action="?/update-task" method="post" use:enhance class="space-y-4">
 		<div class="space-y-1">
 			<Label for="id">Id</Label>
